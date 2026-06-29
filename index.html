@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Damaged Goods · A Program of Self Healing and Self Repair</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #c9a96e;
+    --gold-dim: rgba(201,169,110,0.4);
+    --gold-faint: rgba(201,169,110,0.12);
+    --text-bright: #f0e6d0;
+    --text-mid: rgba(232,224,208,0.65);
+    --text-dim: rgba(232,224,208,0.45);
+    --text-faint: rgba(232,224,208,0.25);
+    --bg-dark: #0a0806;
+    --bg-darker: #0d0b09;
+    --bg-green: #0a0d0a;
+    --bg-blue: #0b0b0d;
+    --border: rgba(255,255,255,0.07);
+    --border-gold: rgba(201,169,110,0.25);
+    --fubar: #D85A30;
+    --snafu: #1D9E75;
+    --fmt-hybrid: #1D9E75;
+    --fmt-online: #378ADD;
+    --fmt-inperson: #BA7517;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-mid);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,8,6,0.96);
+    border-bottom: 0.5px solid var(--border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 0 32px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active { color: var(--gold); }
+
+  .nav-toggle-input {
+    display: none;
+    position: absolute;
+  }
+
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 10px;
+    background: none;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: rgba(232,224,208,0.6);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  /* Mobile dropdown — CSS only, no JS needed */
+  .nav-toggle-input:checked ~ .nav-links {
+    display: flex !important;
+    position: fixed;
+    top: 52px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: rgba(10,8,6,0.99);
+    flex-direction: column;
+    z-index: 9999;
+    padding: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    list-style: none;
+    gap: 0;
+  }
+
+  .nav-toggle-input:checked ~ .nav-links li {
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  }
+
+  .nav-toggle-input:checked ~ .nav-links li:last-child {
+    border-bottom: none;
+  }
+
+  .nav-toggle-input:checked ~ .nav-links li a {
+    display: block;
+    padding: 16px 24px;
+    font-size: 13px;
+    color: rgba(232,224,208,0.6);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 64px 48px;
+    scroll-margin-top: 52px;
+  }
+
+  /* ── LANDING ── */
+  .section-landing { background: var(--bg-dark); }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+  }
+
+  .landing-body { max-width: 600px; }
+
+  .landing-graf {
+    font-size: 19px;
+    line-height: 1.85;
+    color: var(--text-mid);
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .landing-graf + .landing-graf { margin-top: 18px; }
+
+  .landing-divider {
+    width: 36px;
+    height: 1px;
+    background: var(--gold-dim);
+    margin: 28px 0;
+  }
+
+  .landing-hinge {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    line-height: 1.35;
+    color: var(--text-bright);
+    margin-top: 20px;
+    margin-bottom: 36px;
+  }
+
+  .landing-hinge em { color: var(--gold); font-style: italic; }
+
+  .btn-primary {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bg-dark);
+    background: var(--gold);
+    border: none;
+    padding: 13px 28px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-secondary {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    background: none;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    padding: 13px 24px;
+    border-radius: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--border-gold); color: var(--gold); }
+
+  /* ── SECTION TAGS ── */
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  /* ── PROOF ── */
+  .section-proof {
+    background: var(--bg-darker);
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+  }
+
+  .proof-intro {
+    font-family: Georgia, serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-dim);
+    max-width: 560px;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+
+  .scale-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 0;
+    margin-bottom: 8px;
+  }
+
+  .scale-national { color: var(--text-faint); }
+  .scale-local { color: rgba(201,169,110,0.5); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .connector-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 8px 0;
+  }
+
+  .connector {
+    width: 1px;
+    height: 12px;
+    background: var(--border-gold);
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .stat-card.local {
+    background: var(--gold-faint);
+    border-color: var(--border-gold);
+  }
+
+  .stat-number {
+    font-family: Georgia, serif;
+    font-size: 30px;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-card.local .stat-number { font-size: 24px; }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .stat-source {
+    font-size: 10px;
+    color: var(--text-faint);
+    margin-top: 6px;
+  }
+
+  .local-badge {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 0.5px solid var(--border-gold);
+    border-radius: 10px;
+    padding: 2px 7px;
+    margin-bottom: 8px;
+  }
+
+  .proof-close {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-mid);
+    max-width: 520px;
+    font-style: italic;
+    margin-top: 24px;
+  }
+
+  .local-note {
+    font-size: 12px;
+    color: var(--text-faint);
+    line-height: 1.65;
+    max-width: 560px;
+    margin-top: 12px;
+    font-style: italic;
+  }
+
+  /* ── PROGRAM ── */
+  .section-program {
+    background: var(--bg-green);
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+  }
+
+  .program-headline {
+    font-family: Georgia, serif;
+    font-size: 20px;
+    line-height: 1.55;
+    color: var(--text-bright);
+    max-width: 520px;
+    margin-bottom: 8px;
+  }
+
+  .status-row {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0 28px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+  }
+
+  .pill-fubar {
+    border: 0.5px solid rgba(216,90,48,0.35);
+    color: var(--fubar);
+    background: rgba(216,90,48,0.07);
+  }
+
+  .pill-arrow { color: var(--text-faint); font-size: 16px; }
+
+  .pill-snafu {
+    border: 0.5px solid rgba(29,158,117,0.35);
+    color: var(--snafu);
+    background: rgba(29,158,117,0.07);
+  }
+
+  .program-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 640px;
+  }
+
+  .program-block { border-left: 1.5px solid rgba(201,169,110,0.2); padding-left: 18px; }
+
+  .program-block-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 7px;
+  }
+
+  .program-block-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+
+  /* ── CURRICULUM ── */
+  .section-curriculum {
+    background: var(--bg-blue);
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+  }
+
+  .phase-block { margin-bottom: 24px; }
+
+  .phase-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(201,169,110,0.45);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .phase-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .sessions-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .sess-card {
+    background: rgba(255,255,255,0.02);
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sess-card:hover {
+    border-color: rgba(201,169,110,0.35);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .sess-card.active {
+    border-color: var(--gold);
+    background: rgba(201,169,110,0.07);
+  }
+
+  .sess-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .sess-num {
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+  }
+
+  .fmt-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .fmt-hybrid { background: rgba(29,158,117,0.12); color: var(--fmt-hybrid); }
+  .fmt-online { background: rgba(55,138,221,0.12); color: var(--fmt-online); }
+  .fmt-inperson { background: rgba(186,117,23,0.12); color: var(--fmt-inperson); }
+
+  .sess-title {
+    font-size: 12px;
+    color: rgba(232,224,208,0.7);
+    line-height: 1.4;
+    margin-bottom: 3px;
+  }
+
+  .sess-anchor {
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.35;
+  }
+
+  .detail-panel {
+    background: rgba(255,255,255,0.02);
+    border: 0.5px solid var(--border-gold);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .detail-panel.open { display: block; }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .detail-title {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    color: var(--text-bright);
+    line-height: 1.3;
+  }
+
+  .detail-meta {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 4px;
+  }
+
+  .detail-close {
+    font-size: 16px;
+    color: var(--text-faint);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 0 0 12px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .detail-close:hover { color: var(--gold); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .detail-block-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .detail-block-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+
+  .detail-song {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .detail-song span { color: var(--gold); }
+
+  /* ── SCIENCE ── */
+  .section-science {
+    background: var(--bg-darker);
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+  }
+
+  .science-intro {
+    font-family: Georgia, serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-dim);
+    max-width: 560px;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .science-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    max-width: 700px;
+  }
+
+  .science-card {
+    background: rgba(255,255,255,0.02);
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+
+  .science-card-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .science-card-name {
+    font-size: 14px;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .science-card-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ── ABOUT ── */
+  .section-about {
+    background: var(--bg-dark);
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+  }
+
+  .about-body { max-width: 620px; }
+
+  .about-graf {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    line-height: 1.9;
+    color: var(--text-mid);
+    margin-bottom: 20px;
+  }
+
+  .about-graf.strong { color: var(--text-bright); }
+  .about-graf.em { color: var(--gold); font-style: italic; }
+
+  .about-break {
+    width: 36px;
+    height: 1px;
+    background: rgba(201,169,110,0.25);
+    margin: 28px 0;
+  }
+
+  /* ── REGISTER ── */
+  .section-register {
+    background: var(--bg-darker);
+    border-top: 0.5px solid rgba(255,255,255,0.05);
+  }
+
+  .register-title {
+    font-family: Georgia, serif;
+    font-size: 26px;
+    color: var(--text-bright);
+    margin-bottom: 12px;
+    line-height: 1.3;
+    max-width: 520px;
+  }
+
+  .register-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    max-width: 520px;
+    line-height: 1.75;
+  }
+
+  .form-notice {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: rgba(29,158,117,0.07);
+    border: 0.5px solid rgba(29,158,117,0.25);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 28px;
+    max-width: 520px;
+  }
+
+  .form-notice-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1D9E75;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .form-notice-text {
+    font-size: 12px;
+    color: rgba(232,224,208,0.55);
+    line-height: 1.6;
+  }
+
+  .form-notice-text strong { color: #1D9E75; font-weight: 500; }
+
+  .app-form { max-width: 520px; width: 100%; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(232,224,208,0.4);
+  }
+
+  .form-input {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 15px;
+    color: var(--text-bright);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    transition: border-color 0.2s;
+    outline: none;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+
+  .form-input:focus { border-color: rgba(201,169,110,0.5); }
+  .form-input::placeholder { color: rgba(232,224,208,0.2); }
+
+  .form-textarea {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 15px;
+    color: var(--text-bright);
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 130px;
+    transition: border-color 0.2s;
+    outline: none;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+
+  .form-textarea:focus { border-color: rgba(201,169,110,0.5); }
+  .form-textarea::placeholder { color: rgba(232,224,208,0.2); font-style: italic; }
+
+  .form-hint {
+    font-size: 11px;
+    color: rgba(232,224,208,0.25);
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  .form-divider {
+    width: 32px;
+    height: 1px;
+    background: rgba(201,169,110,0.15);
+    margin: 20px 0;
+  }
+
+  .form-consent {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  .form-checkbox {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 0.5px solid rgba(255,255,255,0.2);
+    border-radius: 2px;
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+
+  .form-checkbox:checked { background: #c9a96e; border-color: #c9a96e; }
+
+  .form-consent-text {
+    font-size: 13px;
+    color: rgba(232,224,208,0.4);
+    line-height: 1.65;
+  }
+
+  .form-submit {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #0a0806;
+    background: #c9a96e;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    width: 100%;
+  }
+
+  .form-submit:hover { opacity: 0.85; }
+
+  .form-success {
+    display: none;
+    background: rgba(29,158,117,0.08);
+    border: 0.5px solid rgba(29,158,117,0.3);
+    border-radius: 8px;
+    padding: 28px 32px;
+    max-width: 520px;
+  }
+
+  .form-success.visible { display: block; }
+
+  .form-success-title {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    color: var(--text-bright);
+    margin-bottom: 12px;
+  }
+
+  .form-success-body {
+    font-size: 14px;
+    color: rgba(232,224,208,0.55);
+    line-height: 1.75;
+  }
+
+  .form-success-em {
+    color: #c9a96e;
+    font-style: italic;
+    display: block;
+    margin-top: 16px;
+    font-family: Georgia, serif;
+    font-size: 16px;
+  }
+
+  .footer-line {
+    font-size: 10px;
+    color: rgba(232,224,208,0.14);
+    margin-top: 48px;
+    letter-spacing: 0.07em;
+  }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    .section { padding: 48px 20px; }
+
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .connector-row { grid-template-columns: 1fr 1fr; }
+    .connector-row .connector:nth-child(3),
+    .connector-row .connector:nth-child(4) { display: none; }
+
+    .program-grid { grid-template-columns: 1fr; gap: 16px; }
+    .sessions-row { grid-template-columns: 1fr 1fr; }
+    .detail-grid { grid-template-columns: 1fr; gap: 14px; }
+    .science-grid { grid-template-columns: 1fr; }
+
+    .landing-hinge { font-size: 22px; }
+    .landing-graf { font-size: 17px; }
+    .status-row { flex-direction: column; align-items: flex-start; }
+    .pill-arrow { display: none; }
+
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .connector-row { display: none; }
+    .sessions-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="main-nav">
+  <a class="nav-logo" href="#landing">Damaged Goods</a>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle-input" aria-hidden="true">
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#proof">The proof</a></li>
+    <li><a href="#program">The program</a></li>
+    <li><a href="#curriculum">The curriculum</a></li>
+    <li><a href="#science">The science</a></li>
+    <li><a href="#about">The story</a></li>
+    <li><a href="#register">The practice</a></li>
+  </ul>
+  <label for="nav-toggle" class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </label>
+</nav>
+
+<section class="section section-landing" id="landing">
+  <div class="landing-body">
+    <div class="eyebrow">Damaged Goods · A program of self healing and self repair</div>
+    <p class="landing-graf">Our ancestors were once the most valuable commodity bought, sold, and traded on this continent.</p>
+    <p class="landing-graf">Their bodies were currency — used to secure loans, seal deals, and transfer wealth. Unborn children were leveraged before they drew their first breath by smiling men who never lost a night of sleep over any of it.</p>
+    <div class="landing-divider"></div>
+    <p class="landing-graf">That market is gone. Its damage remains.</p>
+    <p class="landing-hinge">We are the <em>damaged goods.</em></p>
+    <a class="btn-primary" href="#register">Begin the repair</a>
+  </div>
+</section>
+
+<section class="section section-proof" id="proof">
+  <div class="section-tag">The proof of damaged goods</div>
+  <p class="proof-intro">This is not about blame. This is not about personal failure. This is about what happens to a people when the soil they were forced to grow in was designed to produce exactly this.</p>
+
+  <div class="scale-label scale-national">Nationwide</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-number">3×</div><div class="stat-label">Black Americans are unhoused at nearly three times their share of the population — 32% of the homeless, 12% of the country</div><div class="stat-source">HUD / USAFacts, 2024</div></div>
+    <div class="stat-card"><div class="stat-number">2–4×</div><div class="stat-label">Black women die in childbirth at two to four times the rate of white women</div><div class="stat-source">CDC / McKinsey, 2023</div></div>
+    <div class="stat-card"><div class="stat-number">2.4×</div><div class="stat-label">Black Americans live in poverty at more than twice the rate of white Americans</div><div class="stat-source">U.S. Census Bureau, 2024</div></div>
+    <div class="stat-card"><div class="stat-number">5×</div><div class="stat-label">Black adults are imprisoned at five times the rate of white adults</div><div class="stat-source">Bureau of Justice Statistics, 2023</div></div>
+  </div>
+
+  <div class="connector-row">
+    <div class="connector"></div><div class="connector"></div><div class="connector"></div><div class="connector"></div>
+  </div>
+
+  <div class="scale-label scale-local">Here at home · Contra Costa County</div>
+  <div class="stats-grid">
+    <div class="stat-card local"><div class="local-badge">Local</div><div class="stat-number">4×</div><div class="stat-label">Black residents are 8% of the county but 33% of its homeless — four times our share</div><div class="stat-source">Contra Costa Health PIT Count, 2024</div></div>
+    <div class="stat-card local"><div class="local-badge">Local</div><div class="stat-number">2–3×</div><div class="stat-label">Black mothers and infants here face fetal death, premature birth, and maternal complications at two to three times the rate of white mothers</div><div class="stat-source">Ceres Policy Research / CCC, 2023</div></div>
+    <div class="stat-card local"><div class="local-badge">Local</div><div class="stat-number">8%</div><div class="stat-label">Black residents are just 8% of this county's population — but carry a disproportionate share of every adverse outcome measured here</div><div class="stat-source">U.S. Census Bureau, 2024</div></div>
+    <div class="stat-card local"><div class="local-badge">Antioch</div><div class="stat-number">45</div><div class="stat-label">In 2023, nearly half of the Antioch Police Department — 45 officers including supervisors and sergeants — was implicated in a racist text scandal targeting Black and brown residents</div><div class="stat-source">FBI / Contra Costa DA, 2023–2024</div></div>
+  </div>
+
+  <p class="proof-close">These are not personal failings. They are appropriate outcomes for a people who don't grow so well in this societal soil.</p>
+  <p class="local-note">The national picture and the local picture tell the same story. This is not a coincidence. It is a system producing exactly the outcomes it was built to produce.</p>
+</section>
+
+<section class="section section-program" id="program">
+  <div class="section-tag">The program</div>
+  <p class="program-headline">From FUBAR to SNAFU — and finding peace inside the distance between them.</p>
+  <div class="status-row">
+    <span class="pill pill-fubar">FUBAR — fucked up beyond all recognition</span>
+    <span class="pill-arrow">→</span>
+    <span class="pill pill-snafu">SNAFU — situation normal, all fucked up</span>
+  </div>
+  <div class="program-grid">
+    <div class="program-block"><div class="program-block-label">Where you may enter</div><div class="program-block-text">Damaged in ways that have gone unnamed, possibly for generations. The original self is still in there — but buried under inherited and personal wreckage that has made it unrecognizable, even to you.</div></div>
+    <div class="program-block"><div class="program-block-label">Where you can arrive</div><div class="program-block-text">Not fixed. Not healed in a movie montage. Life is still hard, the inheritance is still real — but you are no longer at war with yourself about it. That is not settling. That is wisdom.</div></div>
+    <div class="program-block"><div class="program-block-label">The method</div><div class="program-block-text">12 sessions. Story first, science second, practice third. In person for the first cohort. Led by a descendant who has done the work and is still doing it.</div></div>
+    <div class="program-block"><div class="program-block-label">The destination</div><div class="program-block-text">Practice Absolute Self Appreciation. Not explained at the start. Arrived at together. You will know it when you feel it — because by then, you already will be doing it.</div></div>
+  </div>
+</section>
+
+<section class="section section-curriculum" id="curriculum">
+  <div class="section-tag">The curriculum</div>
+
+  <div class="phase-block">
+    <div class="phase-label">Phase 1 — Understand · Sessions 1–4</div>
+    <div class="sessions-row">
+      <div class="sess-card" onclick="toggleDetail('d1')">
+        <div class="sess-top"><span class="sess-num">01</span><span class="fmt-badge fmt-hybrid">Hybrid</span></div>
+        <div class="sess-title">What was I taught</div>
+        <div class="sess-anchor">The water you were swimming in</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d2')">
+        <div class="sess-top"><span class="sess-num">02</span><span class="fmt-badge fmt-online">Online</span></div>
+        <div class="sess-title">The science of inherited pain</div>
+        <div class="sess-anchor">It's not a character flaw</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d3')">
+        <div class="sess-top"><span class="sess-num">03</span><span class="fmt-badge fmt-online">Online</span></div>
+        <div class="sess-title">The body remembers</div>
+        <div class="sess-anchor">Before the mind catches up</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d4')">
+        <div class="sess-top"><span class="sess-num">04</span><span class="fmt-badge fmt-inperson">In-person</span></div>
+        <div class="sess-title">Two wounds, not one</div>
+        <div class="sess-anchor">Separating what was given from what was earned</div>
+      </div>
+    </div>
+    <div class="detail-panel" id="d1">
+      <div class="detail-header"><div><div class="detail-title">What was I taught</div><div class="detail-meta">Session 01 · Hybrid · Phase 1</div></div><button class="detail-close" onclick="closeDetail('d1')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren opens mid-memory — no introduction. A seven year old on a hardwood floor in North Richmond, surrounded by album covers. Marvin Gaye. The Last Poets. 1971 to now.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Generational learning as biological inheritance. How beliefs, fears, and survival responses are transmitted through family systems before language.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Write down one belief you carry about yourself that you did not choose. One sentence. The real one. The one that shows up when things get hard.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Inner City Blues — Marvin Gaye</span></div>
+    </div>
+    <div class="detail-panel" id="d2">
+      <div class="detail-header"><div><div class="detail-title">The science of inherited pain</div><div class="detail-meta">Session 02 · Online · Phase 1</div></div><button class="detail-close" onclick="closeDetail('d2')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">The moment Loren first heard the epigenetics research explained — and the frame shifted from personal failure to biological inheritance.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Epigenetics: how cortisol, methylation, and stress response patterns transfer across generations. Dr. Joy DeGruy's Post Traumatic Slave Syndrome. Bianca Jones Marlin's neuroscience research.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Read one passage from Post Traumatic Slave Syndrome. Sit with one sentence that lands. Share it or keep it.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Joy and Pain — Maze</span></div>
+    </div>
+    <div class="detail-panel" id="d3">
+      <div class="detail-header"><div><div class="detail-title">The body remembers</div><div class="detail-meta">Session 03 · Online · Phase 1</div></div><button class="detail-close" onclick="closeDetail('d3')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren on hypervigilance — what it felt like to always be scanning, even in safe rooms. Not paranoia. Preparation passed down through generations.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">The polyvagal theory. How the nervous system learns threat patterns. Why Black bodies in America develop elevated baseline stress responses.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">A body-scan check-in: where do you hold tension right now? Not analysis — just location. A map, not a diagnosis.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Family Affair — Sly and the Family Stone</span></div>
+    </div>
+    <div class="detail-panel" id="d4">
+      <div class="detail-header"><div><div class="detail-title">Two wounds, not one</div><div class="detail-meta">Session 04 · In-person · Phase 1</div></div><button class="detail-close" onclick="closeDetail('d4')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren on the military — a different kind of wound, self-authored. Learning that his ancestral inheritance and his personal trauma were not the same injury.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Layered trauma: how complex PTSD compounds with intergenerational stress. Why the treatments differ. The importance of accurate naming.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Two columns: what I inherited, what I experienced. Participants build their own map. In-person sharing in pairs only.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>That's the Way of the World — Earth, Wind &amp; Fire</span></div>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-label">Phase 2 — Name it · Sessions 5–8</div>
+    <div class="sessions-row">
+      <div class="sess-card" onclick="toggleDetail('d5')">
+        <div class="sess-top"><span class="sess-num">05</span><span class="fmt-badge fmt-hybrid">Hybrid</span></div>
+        <div class="sess-title">Self-loathing as immune system</div>
+        <div class="sess-anchor">A protection that stopped protecting</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d6')">
+        <div class="sess-top"><span class="sess-num">06</span><span class="fmt-badge fmt-online">Online</span></div>
+        <div class="sess-title">The parent wound</div>
+        <div class="sess-anchor">What punishment taught us about love</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d7')">
+        <div class="sess-top"><span class="sess-num">07</span><span class="fmt-badge fmt-hybrid">Hybrid</span></div>
+        <div class="sess-title">What connection was supposed to feel like</div>
+        <div class="sess-anchor">The floor was never the destination</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d8')">
+        <div class="sess-top"><span class="sess-num">08</span><span class="fmt-badge fmt-inperson">In-person</span></div>
+        <div class="sess-title">The griot tradition</div>
+        <div class="sess-anchor">Your story has always been medicine</div>
+      </div>
+    </div>
+    <div class="detail-panel" id="d5">
+      <div class="detail-header"><div><div class="detail-title">Self-loathing as immune system</div><div class="detail-meta">Session 05 · Hybrid · Phase 2</div></div><button class="detail-close" onclick="closeDetail('d5')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren on the moment he understood that self-rejection was not failure — it was a survival mechanism that had outlived its usefulness.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Psychological immune theory. How the mind rejects positive information to maintain a stable self-concept. The neuroscience of self-threat.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Name one positive truth about yourself that you instinctively resist believing. Don't fix it. Just notice the resistance.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Use Me — Bill Withers</span></div>
+    </div>
+    <div class="detail-panel" id="d6">
+      <div class="detail-header"><div><div class="detail-title">The parent wound</div><div class="detail-meta">Session 06 · Online · Phase 2</div></div><button class="detail-close" onclick="closeDetail('d6')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren on discovering that the parenting he received was itself an inheritance — survival strategies passed down as love.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Negative reinforcement vs. punishment. What behavioral psychology reveals about conditional love and fear-based compliance. Attachment theory and racial trauma.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Write a letter to the parent you needed — not the one you had. You don't send it. You just say what you needed to hear.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Be Thankful for What You Got — William DeVaughn</span></div>
+    </div>
+    <div class="detail-panel" id="d7">
+      <div class="detail-header"><div><div class="detail-title">What connection was supposed to feel like</div><div class="detail-meta">Session 07 · Hybrid · Phase 2</div></div><button class="detail-close" onclick="closeDetail('d7')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren on rare moments of genuine connection — and why they felt foreign. The difference between surviving with people and actually being seen by them.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Oxytocin and social bonding. How chronic stress suppresses the capacity for trust. Why isolation can feel safer than intimacy.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Describe one moment when you felt genuinely seen. Where were you? Who was there? What made it different?</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Zoom — Commodores</span></div>
+    </div>
+    <div class="detail-panel" id="d8">
+      <div class="detail-header"><div><div class="detail-title">The griot tradition</div><div class="detail-meta">Session 08 · In-person · Phase 2</div></div><button class="detail-close" onclick="closeDetail('d8')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren performs a section of the griot presentation live — no slides, no notes. Story as the method. The audience experiences PASA before it is ever named.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Narrative therapy and healing. The neuroscience of storytelling — how coherent narrative reorganizes traumatic memory. Ubuntu philosophy and communal identity.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Each participant prepares a two-minute story — something true. In-person sharing in a circle. The griot practice begins here.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Simple Song — Sly and the Family Stone</span></div>
+    </div>
+  </div>
+
+  <div class="phase-block">
+    <div class="phase-label">Phase 3 — Practice · Sessions 9–12</div>
+    <div class="sessions-row">
+      <div class="sess-card" onclick="toggleDetail('d9')">
+        <div class="sess-top"><span class="sess-num">09</span><span class="fmt-badge fmt-hybrid">Hybrid</span></div>
+        <div class="sess-title">What PASA actually is</div>
+        <div class="sess-anchor">You've been practicing without knowing it</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d10')">
+        <div class="sess-top"><span class="sess-num">10</span><span class="fmt-badge fmt-online">Online</span></div>
+        <div class="sess-title">Dispositional peace</div>
+        <div class="sess-anchor">Not the absence of struggle</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d11')">
+        <div class="sess-top"><span class="sess-num">11</span><span class="fmt-badge fmt-inperson">In-person</span></div>
+        <div class="sess-title">Building your map</div>
+        <div class="sess-anchor">The process as the gift</div>
+      </div>
+      <div class="sess-card" onclick="toggleDetail('d12')">
+        <div class="sess-top"><span class="sess-num">12</span><span class="fmt-badge fmt-hybrid">Hybrid</span></div>
+        <div class="sess-title">Passing it forward</div>
+        <div class="sess-anchor">You are now someone's ancestor</div>
+      </div>
+    </div>
+    <div class="detail-panel" id="d9">
+      <div class="detail-header"><div><div class="detail-title">What PASA actually is</div><div class="detail-meta">Session 09 · Hybrid · Phase 3</div></div><button class="detail-close" onclick="closeDetail('d9')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">The first time Loren names PASA — not as a concept introduced but as a conclusion the group has already arrived at together.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Self-compassion research (Kristin Neff). The difference between self-esteem and self-appreciation. Why the word 'practice' matters.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Write your own definition of self-appreciation based on what you've learned so far — before you're told what it means.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Shining Star — Earth, Wind &amp; Fire · Lovely Day — Bill Withers</span></div>
+    </div>
+    <div class="detail-panel" id="d10">
+      <div class="detail-header"><div><div class="detail-title">Dispositional peace</div><div class="detail-meta">Session 10 · Online · Phase 3</div></div><button class="detail-close" onclick="closeDetail('d10')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren on where he is now — not healed, not finished, but no longer at war with himself. Peace as a place you return to, not a state you achieve.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Equanimity in Buddhist psychology and Western positive psychology. Stress inoculation and adaptive resilience. The neuroscience of acceptance.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">What is one thing you no longer need to resolve to be okay? Write it. Read it aloud, even alone.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>La Brea — Alex Isley</span></div>
+    </div>
+    <div class="detail-panel" id="d11">
+      <div class="detail-header"><div><div class="detail-title">Building your map</div><div class="detail-meta">Session 11 · In-person · Phase 3</div></div><button class="detail-close" onclick="closeDetail('d11')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren reflects on the journey — what changed, what didn't, and why both matter. Modeling honest accounting without performance.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Post-traumatic growth theory. How meaning-making restructures neural pathways. The role of community witnessing in individual healing.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Participants create a personal healing map: what they carried in, what they named, what they're taking forward. Visual, written, or spoken — their choice.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>Mighty Mighty — Earth, Wind &amp; Fire</span></div>
+    </div>
+    <div class="detail-panel" id="d12">
+      <div class="detail-header"><div><div class="detail-title">Passing it forward</div><div class="detail-meta">Session 12 · Hybrid · Phase 3</div></div><button class="detail-close" onclick="closeDetail('d12')">&#x2715;</button></div>
+      <div class="detail-grid">
+        <div><div class="detail-block-label">Story anchor</div><div class="detail-block-text">Loren closes the way he opened — mid-truth. But this time the truth is theirs. A circle, not a line.</div></div>
+        <div><div class="detail-block-label">Science grounding</div><div class="detail-block-text">Epigenetic healing: evidence that positive behavioral change affects gene expression in descendants. The biology of legacy.</div></div>
+        <div><div class="detail-block-label">Participant practice</div><div class="detail-block-text">Write one thing you want to pass forward — a belief, a practice, a way of being. Address it to someone who comes after you.</div></div>
+      </div>
+      <div class="detail-song">Music · <span>We Are One — Maze · Happy Feelings — Maze</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-science" id="science">
+  <div class="section-tag">The science</div>
+  <p class="science-intro">What you are carrying is not weakness. It is biological inheritance — from people who survived the unsurvivable by adapting in the only ways available to them.</p>
+  <div class="science-grid">
+    <div class="science-card"><div class="science-card-label">The framework</div><div class="science-card-name">Post Traumatic Slave Syndrome</div><div class="science-card-text">Dr. Joy DeGruy's research names the set of behaviors and beliefs that are the adaptive survival responses to centuries of slavery and ongoing oppression — not disorders, but responses.</div></div>
+    <div class="science-card"><div class="science-card-label">The biology</div><div class="science-card-name">Epigenetic inheritance</div><div class="science-card-text">Dr. Bianca Jones Marlin at Columbia University demonstrated that trauma changes gene expression — and those changes are inherited by descendants who never experienced the original event.</div></div>
+    <div class="science-card"><div class="science-card-label">The possibility</div><div class="science-card-name">Epigenetic healing</div><div class="science-card-text">The same system that recorded the trauma can record something else. Intentional environment, community, and practice can begin to change the inherited settings. This is what the program is.</div></div>
+  </div>
+</section>
+
+<section class="section section-about" id="about">
+  <div class="section-tag">About · Iaa Doas</div>
+  <div class="about-body">
+    <p class="about-graf strong">Iaa Doas stands for I Am a Descendant of American Slaves.</p>
+    <p class="about-graf">That is not a political statement. It is a biological one. It is the most accurate description of what I am and where I come from — and it is the lens through which everything on this site should be understood.</p>
+    <p class="about-graf">My name is Loren Dalbert, and I am the founder of Dalbert Design, a lived experience consultancy based in Contra Costa County. In the last five or six years I have been working in the homelessness space — on strategy, policy, and the centering of lived experience in systems that too often speak about us without us.</p>
+    <p class="about-graf">But before I was any of those things, I was damaged goods.</p>
+    <div class="about-break"></div>
+    <p class="about-graf">I did not know that for a long time. What I knew was that something was wrong. Not wrong with the world — wrong with me. That was the story I carried. That my responses were too big, my trust too small, my relationship with safety too broken to be explained by circumstance alone. That something in me was fundamentally deficient.</p>
+    <p class="about-graf">Then I was diagnosed with PTSD.</p>
+    <p class="about-graf">The VA sent me a packet. It had a list of symptoms — the clinical markers of post-traumatic stress. I sat with that list and read through it carefully. And somewhere in the middle of it, something shifted.</p>
+    <p class="about-graf strong">I thought: most of the Black people I know have most of these.</p>
+    <p class="about-graf">Not some. Most.</p>
+    <p class="about-graf">I said that out loud to my cousin. And he said — almost offhand, the way people say things that change your life — "You know there's a sister from South Central Los Angeles who wrote a book about that. It's called Post Traumatic Slave Syndrome."</p>
+    <p class="about-graf">That was the beginning. Not the beginning of my healing — but the beginning of the reframe. The shift from what's wrong with my people to it's not our fault.</p>
+    <div class="about-break"></div>
+    <p class="about-graf">I found Dr. Joy DeGruy's work. I read it. And then I kept going — deeper into the science of trauma, deeper into the question of why these patterns persist across generations even in people who were never directly harmed. That search led me to epigenetics. To the research showing that trauma doesn't just wound the person who experiences it — it changes something in the biology that gets passed forward. To studies demonstrating that the children and grandchildren of people who suffered carry measurable traces of that suffering in their own nervous systems.</p>
+    <p class="about-graf em">That is not a metaphor. That is biology.</p>
+    <p class="about-graf">And that biology — that inherited, measurable, not-your-fault biology — is what this program is built around.</p>
+    <div class="about-break"></div>
+    <p class="about-graf">I built Damaged Goods because I needed it before I knew how to build it. Because I spent years FUBAR — fucked up beyond all recognition — before I understood what had made me that way. And because the path from FUBAR to SNAFU — situation normal, all fucked up, and at peace with that — is not a path anyone should have to find alone.</p>
+    <p class="about-graf">I am not a therapist. I am not a researcher. I am a descendant of American slaves who has done enough of the work to be able to show others where the door is.</p>
+    <p class="about-graf">I am also still doing the work. That matters. You will not be led through this program by someone who has arrived. You will be accompanied by someone who is still on the road — which means I know where the hard parts are because I am still in some of them.</p>
+    <p class="about-graf strong">That is the only credential that counts here.</p>
+    <div class="about-break"></div>
+    <p class="about-graf em">Iaa Doas. I Am a Descendant of American Slaves.</p>
+    <p class="about-graf">That is where we begin. And this is my story.</p>
+  </div>
+</section>
+
+<section class="section section-register" id="register">
+  <div class="register-title">Apply for the next cohort</div>
+  <p class="register-sub">The first cohort meets in person at Lift Up Contra Costa in Antioch, California. Space is limited. The program is free.</p>
+
+  <div class="form-notice">
+    <div class="form-notice-dot"></div>
+    <div class="form-notice-text"><strong>In-person only.</strong> Sessions meet in Antioch, California. A confirmed schedule and address will be shared with accepted applicants directly.</div>
+  </div>
+
+  <div class="app-form" id="app-form">
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="fname">First name</label>
+        <input class="form-input" type="text" id="fname" name="fname" placeholder="Your first name" autocomplete="given-name" />
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="lname">Last name</label>
+        <input class="form-input" type="text" id="lname" name="lname" placeholder="Your last name" autocomplete="family-name" />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="email">Email address</label>
+      <input class="form-input" type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="phone">Phone number</label>
+      <input class="form-input" type="tel" id="phone" name="phone" placeholder="(000) 000-0000" autocomplete="tel" />
+      <span class="form-hint">We'll only use this to confirm your spot and share session details.</span>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-field">
+      <label class="form-label" for="why">Why do you want to join this program?</label>
+      <textarea class="form-textarea" id="why" name="why" placeholder="There's no right answer here. Just tell us what brought you to this page and what you're hoping to find."></textarea>
+      <span class="form-hint">Take your time. This is the most important field on this form.</span>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-consent">
+      <input class="form-checkbox" type="checkbox" id="consent" name="consent" />
+      <label class="form-consent-text" for="consent">I understand this program is free and meets in person at Lift Up Contra Costa in Antioch, California. I understand that space is limited and that applying does not guarantee a spot in the next cohort.</label>
+    </div>
+
+    <button class="form-submit" onclick="handleSubmit()">Submit my application</button>
+  </div>
+
+  <div class="form-success" id="form-success">
+    <div class="form-success-title">Application received.</div>
+    <p class="form-success-body">Thank you for taking this step. We'll be in touch directly to let you know about your spot in the next cohort.<span class="form-success-em">We are not what was done to us. We are what we do next.</span></p>
+  </div>
+
+  <p class="footer-line">Damaged Goods &middot; Iaa Doas &middot; A registered trademark &middot; Contra Costa County, California</p>
+</section>
+
+<script>
+// Close mobile nav when any nav link is tapped
+document.querySelectorAll('.nav-links a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    setTimeout(function() {
+      document.getElementById('nav-toggle').checked = false;
+    }, 50);
+  });
+  link.addEventListener('touchend', function() {
+    setTimeout(function() {
+      document.getElementById('nav-toggle').checked = false;
+    }, 50);
+  }, { passive: true });
+});
+
+// Session card toggle — plain HTML cards, just show/hide detail panels
+function toggleDetail(id) {
+  const panel = document.getElementById(id);
+  const isOpen = panel.classList.contains('open');
+  document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.sess-card').forEach(c => c.classList.remove('active'));
+  if (!isOpen) {
+    panel.classList.add('open');
+    const card = panel.previousElementSibling && panel.previousElementSibling.classList.contains('sessions-row')
+      ? null
+      : null;
+  }
+}
+
+function closeDetail(id) {
+  document.getElementById(id).classList.remove('open');
+  document.querySelectorAll('.sess-card').forEach(c => c.classList.remove('active'));
+}
+
+// Active nav on scroll
+const sections = ['proof','program','curriculum','science','about','register'];
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      document.querySelectorAll('.nav-links a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-40% 0px -55% 0px' });
+
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+
+function handleSubmit() {
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const why = document.getElementById('why').value.trim();
+  const consent = document.getElementById('consent').checked;
+
+  const missing = [];
+  if (!fname || !lname) missing.push('your name');
+  if (!email) missing.push('your email address');
+  if (!phone) missing.push('your phone number');
+  if (!why) missing.push('why you want to join');
+  if (!consent) missing.push('the acknowledgment checkbox');
+
+  if (missing.length > 0) {
+    alert('Please complete the following before submitting:\n\n' + missing.map(m => '· ' + m).join('\n'));
+    return;
+  }
+
+  document.getElementById('app-form').style.display = 'none';
+  document.getElementById('form-success').classList.add('visible');
+  document.getElementById('register').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
